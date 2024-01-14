@@ -1,6 +1,7 @@
 package com.example.android_app
 
 import UIState
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -33,10 +34,14 @@ import coil.compose.AsyncImage
 import com.example.android_app.ui.theme.Android_appTheme
 import android.os.Bundle
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import coil.compose.rememberImagePainter
+import com.example.android_app.repository.DetailsActivity
 import com.example.android_app.repository.Starship
 import kotlin.random.Random
 
@@ -58,12 +63,18 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
-                    MainView(viewModel)
-
+                    MainView(
+                        viewModel = viewModel,
+                        onClick = { id -> navigateToDetails(id) })
                 }
             }
         }
+    }
+
+    fun navigateToDetails(id: String) {
+        val intent = Intent(this, DetailsActivity::class.java)
+        intent.putExtra("CUSTOM_ID", id)
+        startActivity(intent)
     }
 }
 
@@ -72,27 +83,41 @@ class MainActivity : ComponentActivity() {
 //    val starships by viewModel.immutableStarshipsData.observeAsState(emptyList())
 
 @Composable
-fun MyListView(starships: List<Starship>){
+fun MyListView(starships: List<Starship>, onClick: (String) -> Unit){
 //    if (starships.isNotEmpty()){
         // don't forget -> import androidx.compose.foundation.lazy.items
     LazyColumn{
         items(starships) {starship ->
             Log.d("MainActivity", "${starship.name}")
-            StarshipView(name = starship.name, model = starship.model)
-            }
+            StarshipView(
+                name = starship.name,
+                model = starship.model,
+                onClick = { id -> onClick.invoke(id) })
         }
     }
+}
 
 @Composable
-fun MainView(viewModel: MainViewModel) {
-    val uiState by viewModel.liveDataStarships.observeAsState(UIState())
+fun MainView(viewModel: MainViewModel, onClick: (String) -> Unit) {
+    val uiState by viewModel
+        .liveDataStarships.observeAsState(UIState())
 
     when {
-        uiState.isLoading -> { MyLoadingView() }
+        uiState.isLoading -> {
+            MyLoadingView()
+        }
 
-        uiState.error != null -> { MyErrorView(uiState.error) }
+        uiState.error != null -> {
+            MyErrorView(uiState.error)
+        }
 
-        uiState.data != null -> { uiState.data?.let { MyListView(starships = it) } }
+        uiState.data != null -> {
+            uiState.data?.let {
+                MyListView(
+                    starships = it,
+                    onClick = { id -> onClick.invoke(id) })
+            }
+        }
     }
 }
 
@@ -108,7 +133,7 @@ fun MyErrorView(error: String?){
 
 
 @Composable
-fun StarshipView(name: String, model: String) {
+fun StarshipView(name: String, model: String, onClick: (String) -> Unit) {
 
     val randomNumber = Random.nextInt(1, 6)
     val randomImageResource = getRandomImage(randomNumber)
@@ -117,6 +142,8 @@ fun StarshipView(name: String, model: String) {
         modifier = Modifier
             .padding(30.dp)
             .fillMaxWidth()
+            .clickable{ onClick.invoke("1")}
+//            .clickable { onClick.invoke()}
     ){
         Text(
 //            text = "Luke Skywalker",
@@ -197,6 +224,6 @@ fun getRandomImage(number: Int) =
 @Composable
 fun StarshipViewPreview() {
     Android_appTheme {
-        StarshipView("test_name", "test_model")
-    }
+        StarshipView("test_name", "test_model", onClick = {})
+        }
 }
