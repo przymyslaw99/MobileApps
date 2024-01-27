@@ -35,9 +35,17 @@ import com.example.android_app.ui.theme.Android_appTheme
 import android.os.Bundle
 import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import coil.compose.rememberImagePainter
@@ -58,14 +66,14 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             Android_appTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     MainView(
                         viewModel = viewModel,
-                        onClick = { id -> navigateToDetails(id) })
+                        onClick = { id -> navigateToDetails(id) }
+                    )
                 }
             }
         }
@@ -78,14 +86,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-//@Composable
-//fun StarshipsDisplay(viewModel: MainViewModel){
-//    val starships by viewModel.immutableStarshipsData.observeAsState(emptyList())
 
 @Composable
 fun MyListView(starships: List<Starship>, onClick: (String) -> Unit){
-//    if (starships.isNotEmpty()){
-        // don't forget -> import androidx.compose.foundation.lazy.items
     LazyColumn{
         items(starships) {starship ->
             Log.d("MainActivity", "${starship.name}")
@@ -134,82 +137,189 @@ fun MyErrorView(error: String?){
 
 @Composable
 fun StarshipView(name: String, model: String, onClick: (String) -> Unit) {
-
     val randomNumber = Random.nextInt(1, 6)
     val randomImageResource = getRandomImage(randomNumber)
 
-    Column (
+    Box(
         modifier = Modifier
-            .padding(30.dp)
+            .padding(16.dp)
             .fillMaxWidth()
-            .clickable{ onClick.invoke("1")}
-//            .clickable { onClick.invoke()}
-    ){
-        Text(
-//            text = "Luke Skywalker",
-            text = name,
-            fontStyle = FontStyle.Italic,
-            color = Color.Black,
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.LightGray)
+            .clickable { onClick.invoke("1") }
+    ) {
+        Column(
             modifier = Modifier
-//                .padding(10.dp)
-//                .border(BorderStroke(1.dp, Color.Black))
-                .background(Color.Gray),
-        )
-        Text(
-            text = model,
-            fontStyle = FontStyle.Italic,
-            color = Color.White,
-            modifier = Modifier
-//                .padding(10.dp)
-//                .border(BorderStroke(1.dp, Color.Black))
-                .background(Color.Black),
-        )
-
-        Text(
-            text = "19.99 $",
-            color = Color.Green,
-//            modifier = Modifier
-//                .padding(horizontal = 35.dp)
-        )
-
-        Button(
-            onClick = { /* Handle button click here */ },
-//            modifier = Modifier.padding(horizontal = 16.dp)
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Text(
-                text = "Buy here",
+                text = name,
+                fontSize = 24.sp,
                 color = Color.Black,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = model,
+                color = Color.Black,
+                fontStyle = FontStyle.Italic,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "19.99 $",
+                color = Color.Black,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = { /* Handle button click here */ },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(contentColor = Color.Yellow)
+            ) {
+                Text(
+                    text = "Buy Here",
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold
                 )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            AsyncImage(
+                model = randomImageResource,
+                contentDescription = "#Description",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .clip(shape = RoundedCornerShape(8.dp))
+            )
         }
-
-//        AsyncImage(model = randomImageResource)
-
-        AsyncImage(
-            model = randomImageResource,
-//            model = "https://fastly.picsum.photos/id/111/4400/2656.jpg?hmac=leq8lj40D6cqFq5M_NLXkMYtV-30TtOOnzklhjPaAAQ",
-            contentDescription = "#Description",
-//            contentScale =
-            modifier = Modifier
-                .height(100.dp)
-                .width(120.dp)
-        )
-
-//        Text(
-//            text = "Free delivery!",
-//            fontStyle = FontStyle.Italic,
-//            color = Color.White,
-//            modifier = Modifier
-//                .padding(horizontal = 18.dp)
-//                .border(BorderStroke(1.dp, Color.Black))
-//                .background(Color.Gray)
-//        )
-
     }
 }
 
-//fun Text(text: String, fontSize: String, fontStyle: FontStyle, color: Color, modifier: Modifier) {
-//
-//}
+
+
+@Composable
+fun DetailView(name: String, model: String, manufacturer: String, speed: String, hyperdrive: String) {
+    val randomNumber = Random.nextInt(1, 6)
+    val randomImageResource = getRandomImage(randomNumber)
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .background(Color.LightGray)
+    ) {
+        Text(
+            text = "Starship details:",
+            style = TextStyle(
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Name: $name",
+            style = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            textAlign = TextAlign.Start
+        )
+
+        Text(
+            text = "Model: $model",
+            style = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            textAlign = TextAlign.Start
+        )
+
+        Text(
+            text = "Manufacturer: $manufacturer",
+            style = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            textAlign = TextAlign.Start
+        )
+
+        Text(
+            text = "Max atmosphering speed: $speed",
+            style = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            textAlign = TextAlign.Start
+        )
+
+        Text(
+            text = "Hyperdrive rating: $hyperdrive",
+            style = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            textAlign = TextAlign.Start
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        AsyncImage(
+            model = randomImageResource,
+            contentDescription = "#Description",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .clip(shape = RoundedCornerShape(8.dp))
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+    }
+
+}
+
 
 fun getRandomImage(number: Int) =
     when(number){
@@ -225,5 +335,14 @@ fun getRandomImage(number: Int) =
 fun StarshipViewPreview() {
     Android_appTheme {
         StarshipView("test_name", "test_model", onClick = {})
-        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DetailViewPreview() {
+    Android_appTheme {
+        DetailView("test_name", "test_model",
+            "test_manufacturer", "test_speed", "test_hyperdrive")
+    }
 }
